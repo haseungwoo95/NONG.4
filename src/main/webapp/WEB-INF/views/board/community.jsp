@@ -16,9 +16,11 @@
             </div>
 
             <div>
-                <button class="writeBtn pointer">
-                    <a href="boardWrite"><i class="fas fa-pen"></i>글쓰기</a>
-                </button>
+                <a href="boardWrite">
+                    <button class="writeBtn pointer">
+                        <i class="fas fa-pen">글쓰기</i>
+                    </button>
+                </a>
             </div>
 
             <div class="cate-event">
@@ -45,9 +47,11 @@
                         <div class="swiper-wrapper">
                             <!-- Slides -->
                             <div class="swiper-slide"><img src="/res/img/junior.png" class="junior-class pointer"></div>
-                            <div class="swiper-slide"><img src="/res/img/intermediate.png" class="intermediate-class pointer"></div>
-                            <div class="swiper-slide"><img src="/res/img/advanced.png" class="advanced-class pointer"></div>
-                            <div class="swiper-slide"><img src="/res/img/master.png" class="master-class pointer"></div>
+                            <div class="swiper-slide"><img src="/res/img/intermediate.png"
+                                                           class="intermediate-class pointer"></div>
+                            <div class="swiper-slide"><img src="/res/img/advanced.png" class="advanced-class pointer">
+                            </div>
+                            <div class="swiper-slide"><img src="/res/img/master.png" class="master-class pointer"></div>1
                         </div>
                         <!-- If we need pagination -->
                         <div class="swiper-pagination"></div>
@@ -57,9 +61,44 @@
                     </div>
                 </div>
                 <div class="news">
-                    <div>주요소식</div>
-                    <c:forEach begin="1" end="5">
-                        <div>[질문게시판] 이러쿵저러쿵 여러 질문들이 있다 ※나중에 테이블 만들어서 수정</div>
+
+                    <div style="border-bottom: 1px solid #d3d3d3;">주요소식</div> 
+              
+                    <div id="comm-paging">
+                    </div>
+              
+                    <c:forEach items="${list}" var="list" begin="0" end="4">
+                        <a class="record pointer" onclick="moveToDetail(${list.iboard});">
+                            <div class="news-list">
+                                <c:choose>
+                                    <c:when test="${list.provider == 'freedom'}">
+                                        <div>[자유게시판] ${list.title}</div>
+                                    </c:when>
+                                    <c:when test="${list.provider == 'question'}">
+                                        <div>[질문게시판] ${list.title}</div>
+                                    </c:when>
+                                    <c:when test="${list.provider == 'strategy'}">
+                                        <div>[공략게시판] ${list.title}</div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div>[친구게시판] ${list.title}</div>
+                                    </c:otherwise>
+                                </c:choose>
+                                <%--dl : 리스트--%>
+                                <%--dt : 메인 카테고리--%>
+                                <%--dd : 메인아래 카테고리--%>
+                                <dl class="news-dl">
+                                    <dt style="visibility: hidden; display: none;">writer</dt>
+                                    <dt style="visibility: hidden; display: none;" >ctnt</dt>
+
+                                    <dd style="display: inline; margin-right: 30px;">${list.userNick}</dd>
+                                    <dd class="news-dd-span">
+                                        <span>${list.regdt}</span>
+                                        <span>조회수${list.hitCount}</span>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </a>
                     </c:forEach>
                 </div>
                 <div class="today-video">
@@ -77,13 +116,13 @@
 <script type="module">
     const swiper = new Swiper('.swiper-container', {
         // Optional parameters
-        slidesPerView : 2, // 동시에 보여줄 슬라이드 갯수
-        spaceBetween : -60, // 슬라이드간 간격
+        slidesPerView: 2, // 동시에 보여줄 슬라이드 갯수
+        spaceBetween: -60, // 슬라이드간 간격
         direction: 'horizontal',
         loop: true,
-        autoplay : {  // 자동 슬라이드 설정 , 비 활성화 시 false
-            delay : 3000,   // 시간 설정
-            disableOnInteraction : false,  // false로 설정하면 스와이프 후 자동 재생이 비활성화 되지 않음
+        autoplay: {  // 자동 슬라이드 설정 , 비 활성화 시 false
+            delay: 3000,   // 시간 설정
+            disableOnInteraction: false,  // false로 설정하면 스와이프 후 자동 재생이 비활성화 되지 않음
         },
         // If we need pagination
         pagination: {
