@@ -24,13 +24,13 @@ public class BoardController {
 
     @Autowired private BoardService service;
     @Autowired private IAuthenticationFacade auth;
-    @Autowired HttpServletResponse response;
+    @Autowired private HttpServletResponse response;
 
     @GetMapping("/home")
     public String home() {
-        Cookie cookie = new Cookie("hit",null); // 쿠키 생성(home에 접근할 경우에만 생성 됨)
+        Cookie cookie = new Cookie("hit",null);
         cookie.setMaxAge(60*60*24);
-        response.addCookie(cookie); // response에 쿠키 전달
+        response.addCookie(cookie);
 
         return "board/home";
     }
@@ -92,6 +92,7 @@ public class BoardController {
     public String boardDetail(@CookieValue(name ="hit", required = false) String cookie, BoardDomain param, BoardImgEntity imgParam, Model model) {
         // home에서 생성된 쿠키를 @CookieValue를 사용하여 detail에서 전달 받음
         if(!(cookie.contains(String.valueOf(param.getIboard())))) { // 쿠키값에 iboard값이 포함이 되어 있지 않다면
+            System.out.println("나오면 안돼요");
             cookie += param.getIboard() + "/"; // 쿠키에 iboard값 마다마다 누적
             model.addAllAttributes(service.boardDetailHit(param)); // 조회수 증가
         }
