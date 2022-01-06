@@ -5,8 +5,6 @@ import com.spring.nong4.api.model.monthFarmTechDtlDomain;
 import com.spring.nong4.board.model.PageMaker;
 import com.spring.nong4.board.model.SearchCriteria;
 import com.spring.nong4.api.model.apiVideoDomain;
-import com.spring.nong4.common.MyFarmFileUtils;
-import com.spring.nong4.common.MyFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -30,11 +28,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/api")
 public class ApiController {
-    @Autowired private MyFarmFileUtils myFileUtils;
 
     private static String getTagValue(String tag, Element eElement) {
         NodeList nList = eElement.getElementsByTagName(tag).item(0).getChildNodes();
@@ -254,57 +253,97 @@ public class ApiController {
         return "api/monthFarmTech";
     }
 
-//    @GetMapping("/monthFarmTech")
-//    public String monthFarmTechDtl(monthFarmTechDtlDomain farmTechDomain) {
-//        StringBuffer result = new StringBuffer();
-//        String urlParse = "";
-//        monthFarmTechDtlDomain.itemTag itemTag;
-//
-//        System.out.println("farmTechDomain! : " + farmTechDomain);
-//
-//        try {
-//            StringBuilder urlBuilder = new StringBuilder("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechDtl");
-//            urlBuilder.append("?" + URLEncoder.encode("apiKey", "UTF-8") + "=" + "20220105GHIZRN4S603UMMISOFCEXQ");
-//            urlBuilder.append("&" + URLEncoder.encode("srchCntntsSnn", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
-//            urlBuilder.append("&" + URLEncoder.encode("srchCurationNo", "UTF-8") + "=" + URLEncoder.encode("1724","UTF-8"));
-//
-//            URL url = new URL(urlBuilder.toString());
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//            conn.setRequestMethod("GET");
-//            conn.setRequestProperty("Content-type", "application/json");
-//
-//            BufferedReader rd;
-//            if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
-//                rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//            } else {
-//                rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-//            }
-//            String line;
-//            while((line = rd.readLine()) != null) {
-//                result.append(line + "\n");
-//            }
-//            urlParse = result.toString();
-//
-//            System.out.println("urlParse : " + urlParse);
-//
-//            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-//            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-//            Document document = dBuilder.parse(new InputSource(new StringReader(urlParse)));
-//
-//            //root tag(<response>)
-//            document.getDocumentElement().normalize();
-//
-//            // node tag name
-//            NodeList nList = document.getElementsByTagName("item");
-//
-//            rd.close();
-//            conn.disconnect();
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
+    @GetMapping("/monthFarmTechDtl")
+    public String monthFarmTechDtl(monthFarmTechDtlDomain farmTechDtlDomain, Model model) {
+        StringBuffer result = new StringBuffer();
+        String urlParse = "";
+        monthFarmTechDtlDomain.itemTag itemTag;
+
+        try {
+            StringBuilder urlBuilder = new StringBuilder("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechDtl");
+            urlBuilder.append("?" + URLEncoder.encode("apiKey", "UTF-8") + "=" + "20220105GHIZRN4S603UMMISOFCEXQ");
+            urlBuilder.append("&" + URLEncoder.encode("srchCntntsSnn", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
+            urlBuilder.append("&" + URLEncoder.encode("srchCurationNo", "UTF-8") + "=" + URLEncoder.encode(farmTechDtlDomain.getSrchCurationNo(),"UTF-8"));
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-type", "application/json");
+
+            BufferedReader rd;
+            if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+                rd = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            } else {
+                rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+            }
+            String line;
+            while((line = rd.readLine()) != null) {
+                result.append(line + "\n");
+            }
+            urlParse = result.toString();
+
+            System.out.println("urlParse : " + urlParse);
+
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document document = dBuilder.parse(new InputSource(new StringReader(urlParse)));
+
+            //root tag(<response>)
+            document.getDocumentElement().normalize();
+
+            // node tag name
+            NodeList nList = document.getElementsByTagName("item");
+            List<monthFarmTechDtlDomain.itemTag> farmTechItemList = new ArrayList<>();
+
+            Node nNode = nList.item(0);
+
+            if(nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode;
+
+                itemTag = new monthFarmTechDtlDomain.itemTag();
+
+                String str = getTagValue("cntntsInfoHtml",eElement);
+                String reg = "<img src(?:.*?)/ps/img";
+                String nongsaUrl = "http://www.nongsaro.go.kr/ps";
+                String newTxt = "";
+                Pattern pattern = Pattern.compile(reg);
+                Matcher matcher = pattern.matcher(str);
+
+                while (matcher.find()) {
+                    String before = str.substring(0, matcher.start(0));
+                    String after = str.substring(matcher.end(0));
+                    String matchStr = matcher.group(0);
+
+                    matchStr = matchStr.replaceAll("/ps", nongsaUrl);
+
+                    newTxt += before + matchStr + after;
+                    matcher = pattern.matcher(newTxt);
+                }
+                System.out.println("TEST : " +newTxt);
+
+                itemTag.setCntntsInfoHtml(newTxt);
+                farmTechItemList.add(itemTag);
+            }
+
+            farmTechDtlDomain.setSrchCntntsSnn(farmTechDtlDomain.getSrchCntntsSnn());
+            farmTechDtlDomain.setSrchCurationNo(farmTechDtlDomain.getSrchCurationNo());
+
+            farmTechDtlDomain.setFarmTechItemList(farmTechItemList);
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("farmTechDtlDomain", farmTechDtlDomain);
+
+            model.addAllAttributes(map);
+
+            rd.close();
+            conn.disconnect();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "api/monthFarmTechDtl";
+    }
 
     @GetMapping("/intermediate")
     public String intermediate() {
