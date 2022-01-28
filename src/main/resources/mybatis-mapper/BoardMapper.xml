@@ -130,6 +130,7 @@
              , A.hitCount
              , B.nick AS userNick
              , B.iuser
+             , B.profileImg
              , CASE WHEN (SELECT iboard
                           FROM t_board_fav
                           WHERE iboard = #{iboard}
@@ -159,5 +160,31 @@
         DELETE FROM t_board_fav
         WHERE iuser = #{iuser} AND iboard = #{iboard}
     </delete>
+
+    <select id="totalSearch" resultType="boardDomain">
+        SELECT A.iboard
+             , A.title
+             , A.ctnt
+             , B.nick AS userNick
+             , DATE_FORMAT(A.regdt, '%Y-%m-%d') AS regdt
+        FROM t_board A
+        INNER JOIN t_user B
+        ON A.iuser = B.iuser
+        WHERE 1 = 1
+        AND A.title LIKE CONCAT('%',#{scri.keyword},'%')
+        OR  A.ctnt  LIKE CONCAT('%',#{scri.keyword},'%')
+        ORDER BY A.iboard DESC
+        LIMIT #{scri.pageStart} , #{scri.perPageNum};
+    </select>
+
+    <select id="totalSearchCount" resultType="Integer">
+        SELECT COUNT(*)
+        FROM t_board A
+        INNER JOIN t_user B
+        ON A.iuser = B.iuser
+        WHERE 1 = 1
+        AND A.title LIKE CONCAT('%',#{scri.keyword},'%')
+        OR  A.ctnt  LIKE CONCAT('%',#{scri.keyword},'%')
+    </select>
 
 </mapper>

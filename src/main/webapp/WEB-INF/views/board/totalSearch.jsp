@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div class="background">
     <div class="background-left"></div>
@@ -39,6 +40,19 @@
                 <div><a href="mainBoard?provider=question">질문 게시판</a></div>
                 <div><a href="mainBoard?provider=strategy">공략 게시판</a></div>
                 <div><a href="mainBoard?provider=friend">친구 게시판</a></div>
+            </div>
+        </div>
+        <div class="community">
+            <div class="community-top"></div>
+            <div class="community-board">
+                <div class="list-board">
+                    <div class="boardlist-bottom" data-pagenum="${pageMaker.cri.page}" data-keyword="${pageMaker.keyword}" >
+                    </div>
+                </div>
+                <div class="list-video" ></div>
+                <div class="list-month">
+                    @@ : ${farmTech}
+                </div>
             </div>
         </div>
     </div>

@@ -46,6 +46,7 @@ public class ApiService {
         StringBuffer result = new StringBuffer();
         String urlParse = "";
         apiVideoDomain.itemTag itemTag;
+        System.out.println("NUMOFROWS : " + apiVideoDomain.getNumOfRows());
 
         try {
             StringBuilder urlBuilder = new StringBuilder("http://api.nongsaro.go.kr/service/curationMvp/curationMvpList");
@@ -61,11 +62,15 @@ public class ApiService {
             }
             if(apiVideoDomain.getPageNo() != null) {
                 urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode(apiVideoDomain.getPageNo(), "UTF-8"));
-            } else
-            {
+            } else {
                 urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
             }
-            urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10","UTF-8"));
+            if(apiVideoDomain.getNumOfRows() == "5") {
+                urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("5","UTF-8"));
+            } else {
+                urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10","UTF-8"));
+            }
+
 
             URL url = new URL(urlBuilder.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -133,7 +138,6 @@ public class ApiService {
             pageMaker.setDisplayPageNum(Integer.parseInt(apiVideoDomain.getNumOfRows()));
             pageMaker.setTotalCount(Integer.parseInt(apiVideoDomain.getTotalCount()));
 
-
             map.put("apiVideoDomain", apiVideoDomain);
             map.put("pageMaker",pageMaker);
 
@@ -152,6 +156,7 @@ public class ApiService {
         StringBuffer result = new StringBuffer();
         String urlParse = "";
         monthFarmTechDomain.itemTag itemTag;
+        System.out.println("DOMAIN_TEST : " + farmTechDomain);
 
         try {
             StringBuilder urlBuilder = new StringBuilder("http://api.nongsaro.go.kr/service/monthFarmTech/monthFarmTechLst");
@@ -236,6 +241,8 @@ public class ApiService {
             farmTechDomain.setSrchStr(farmTechDomain.getSrchStr());
             farmTechDomain.setSEraInfo(farmTechDomain.getSEraInfo());
             farmTechDomain.setFarmTechItemList(farmTechItemList);
+
+            System.out.println("DOMAIN : " + farmTechDomain);
 
             PageMaker pageMaker = new PageMaker();
             pageMaker.setCri(scri);
@@ -373,12 +380,12 @@ public class ApiService {
             }
         }
         imgMap.put("img", imgList);
+        System.out.println("IMG : " + imgList);
 
         return imgMap;
     }
 
     public Map<String, Object> farmWorkingPlan() {
-
         Map<String, Object> map = new HashMap<>();
         StringBuffer result = new StringBuffer();
         String urlParse = "";
@@ -600,6 +607,7 @@ public class ApiService {
         StringBuffer result = new StringBuffer();
         String urlParse = "";
         farmWorkingPlanDomain.schedultDt schedultDt;
+        System.out.println();
 
         try {
             StringBuilder urlBuilder = new StringBuilder("http://api.nongsaro.go.kr/service/farmWorkingPlanNew/workScheduleDtl");
